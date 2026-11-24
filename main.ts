@@ -801,6 +801,9 @@ function run(args: string[]): { code: number; out: string[] } {
   } catch {
     if (file !== null) return { code: 2, out: ['error: no-patch'] };
   }
+  // A patch saved with a UTF-8 byte-order mark (some editors add one) is the
+  // same patch: drop the mark so format detection sees the first line as-is.
+  if (text.startsWith('\uFEFF')) text = text.slice(1);
   const lines = patchLines(text);
   const kind = format === null || format === 'auto' ? detect(lines) : format;
   if (kind === null) return { code: 2, out: ['error: format'] };
